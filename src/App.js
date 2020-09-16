@@ -3,6 +3,7 @@ import * as BooksAPI from './BooksAPI'
 import './App.css'
 import { Link, Route } from 'react-router-dom'
 import Shelf from './Shelf.js'
+import Book from './Book.js'
 
 class BooksApp extends React.Component {
 
@@ -20,18 +21,12 @@ class BooksApp extends React.Component {
 
   state = {
     books: [],
-    search: ''
+    searchBooks: []
   }
 
   componentDidMount() {
     BooksAPI.getAll().then((bookList) => this.setState({
       books: bookList
-    }))
-  }
-
-  handleSearchChange = (search) => {
-    this.setState(() => ({
-      search: search
     }))
   }
 
@@ -47,6 +42,27 @@ class BooksApp extends React.Component {
         books: prevState.books.filter(b => b.id !== book.id).concat(book)
       }))
     }
+  }
+
+  handleSearchChange = (event) => {
+    const value = event.target.value
+ 
+    if (value !== '') {
+      BooksAPI.search(value).then(books => {
+        if (books.error) {
+          this.setState({searchBooks: []})
+        } else {
+          this.setState({
+            searchBooks: books
+          })
+        }
+      })
+    } else {
+      this.setState(() => ({
+        searchBooks: []
+      }))
+    }
+
   }
 
   render() {
@@ -81,12 +97,16 @@ class BooksApp extends React.Component {
                 <button className="close-search">Close</button>
               </Link>
               <div className="search-books-input-wrapper">
-                <input type="text" placeholder="Search by title or author"/>
+                <input type="text" placeholder="Search by title or author" onChange={(event) => this.handleSearchChange(event)}/>
               </div>
             </div>
             <div className="search-books-results">
               <ol className="books-grid">
-
+                {
+                  this.state.searchBooks.map((book) => (
+                    <Book bookInfo={book} key={book.id} onMove={this.onMove}/>
+                  ))
+                }
               </ol>
             </div>
           </div>

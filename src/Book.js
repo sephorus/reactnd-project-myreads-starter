@@ -20,18 +20,25 @@ class Book extends Component {
     }
 
     render() {
+        console.log(this.props.bookInfo)
         const { bookInfo } = this.props;
         let authors = "";
-        for (let i = 0; i < bookInfo.authors.length; i++) {
-            authors += bookInfo.authors[i] + ", ";
+
+        if (bookInfo.authors) {
+            for (let i = 0; i < bookInfo.authors.length; i++) {
+                authors += bookInfo.authors[i] + ", ";
+            }
+            authors = authors.slice(0, -2)
         }
-        authors = authors.slice(0, -2)
+
         return (
             <li key={bookInfo.id}>
             <div className="book">
                 <div className="book-top">
                     <div className="book-cover" style={{ width: 128, height: 188, backgroundImage: `url(${
-                        bookInfo.imageLinks.thumbnail
+                        bookInfo.imageLinks
+                            ? bookInfo.imageLinks.thumbnail
+                            : 'icons/book-placeholder.svg'
                     })` }}></div>
                         <div className="book-shelf-changer">
                             <ShelfChanger shelf={this.props.bookInfo.shelf} onChangeShelf={this.handleChangeShelf}/>
